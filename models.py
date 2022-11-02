@@ -366,7 +366,7 @@ class SingleRoundGraphLSTM_pyg(MessagePassing_custom):
         h_two_type = torch.cat((h_t0, h_t1), 1) # (num_edges, 2*h_size)
         iou_pre_mid = self.U_iou(h_two_type) # (num_edges, 3*h_size)
         from torch_scatter import scatter_add
-        iou_mid = scatter_add(iou_pre_mid, edge_index[0], 0, iou_mid, node_num, 0)  ## (batch_size, 3*h_size)
+        iou_mid = scatter_add(iou_pre_mid, edge_index[0], 0, iou_mid, node_num)  ## (batch_size, 3*h_size)
         #iou_mid = torch.sum(self.U_iou(h_two_type), 1) # (batch_size, 3 * h_size)
         f_mid = self.U_f(h_two_type) # (num_edges, h_size)
         
@@ -375,7 +375,7 @@ class SingleRoundGraphLSTM_pyg(MessagePassing_custom):
         c_j = torch.clamp(c_j,min=-1e14,max=1e14)
         #f = torch.sigmoid(nodes.data['wf_x'].unsqueeze(1).repeat(1, in_degree, 1) + f_mid + self.b_f)
         f_post_mid = f * c_j
-        c = scatter_add(f_post_mid, edge_index[0], 0, c, node_num, 0)
+        c = scatter_add(f_post_mid, edge_index[0], 0, c, node_num)
         # second term of c
         #c = torch.sum(f * nodes.mailbox['c'], 1) 
         return {'iou_mid': iou_mid,  'c': c}
@@ -488,7 +488,7 @@ class SingleRoundGraphLSTM_pyg_double(MessagePassing_custom):
         iou_pre_mid = self.U_iou(h_two_type) # (num_edges, 3*h_size)
         #from torch_scatter import scatter_mean, scatter_add
         from torch_scatter import scatter_add
-        iou_mid = scatter_add(iou_pre_mid, edge_index[0], 0, iou_mid, node_num, 0)  ## (batch_size, 3*h_size)
+        iou_mid = scatter_add(iou_pre_mid, edge_index[0], 0, iou_mid, node_num)  ## (batch_size, 3*h_size)
         #iou_mid = torch.sum(self.U_iou(h_two_type), 1) # (batch_size, 3 * h_size)
         f_mid = self.U_f(h_two_type) # (num_edges, h_size)
         
@@ -497,7 +497,7 @@ class SingleRoundGraphLSTM_pyg_double(MessagePassing_custom):
         c_j = torch.clamp(c_j,min=-1e14,max=1e14)
         f_post_mid = f * c_j
 
-        c = scatter_add(f_post_mid, edge_index[0], 0, c, node_num, 0)
+        c = scatter_add(f_post_mid, edge_index[0], 0, c, node_num)
         return {'iou_mid': iou_mid,  'c': c}
         
 
